@@ -56,6 +56,30 @@ export function SignUpForm({
     }
   };
 
+  const handleSignUpSocial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const supabase = createClient();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+
+      if (error) throw error;
+      // Update this route to redirect to an authenticated route. The user already has an active session.
+      // router.push("/protected");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -113,6 +137,7 @@ export function SignUpForm({
               </Link>
             </div>
           </form>
+          <button onClick={handleSignUpSocial}>Google</button>
         </CardContent>
       </Card>
     </div>

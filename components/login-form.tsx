@@ -46,6 +46,25 @@ export function LoginForm({
       setIsLoading(false);
     }
   };
+  const handleLoginSocial = async () => {
+    const supabase = createClient();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      // The user will be redirected by Supabase, no need to push manually.
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -103,6 +122,7 @@ export function LoginForm({
               </Link>
             </div>
           </form>
+          <button type="button" onClick={handleLoginSocial}>Google</button>
         </CardContent>
       </Card>
     </div>
