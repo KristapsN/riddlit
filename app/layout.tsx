@@ -27,7 +27,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className} antialiased`}>
-        {/* <Elements stripe={stripePromise}> */}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -36,7 +35,6 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
-        {/* </Elements> */}
       </body>
     </html>
   );
