@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { stripe } from "../../../../lib/stripe"
+import { defaultUrl } from "@/app/layout";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { mode, userEmail } = body; // expected: 'subscription' or 'one_time'
 
-    const successUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/?checkout=success`;
-    const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/?checkout=canceled`;
+    const successUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? defaultUrl}/?checkout=success`;
+    const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? defaultUrl}/?checkout=canceled`;
 
     let session;
 
