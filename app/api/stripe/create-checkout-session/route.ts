@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { stripe } from "../../../../lib/stripe"
-import { defaultUrl } from "@/app/layout";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { mode, userEmail } = body; // expected: 'subscription' or 'one_time'
+
+    const defaultUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
 
     const successUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? defaultUrl}/?checkout=success`;
     const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? defaultUrl}/?checkout=canceled`;
@@ -25,8 +28,8 @@ export async function POST(req: Request) {
         customer_email: userEmail, // prefill customer email
         line_items: [
           {
-        price: priceId,
-        quantity: 1,
+            price: priceId,
+            quantity: 1,
           },
         ],
         success_url: successUrl,
