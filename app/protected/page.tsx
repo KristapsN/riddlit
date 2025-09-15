@@ -638,8 +638,7 @@ export default function Maze() {
   ]
 
   const fontCall = async () => {
-    const REACT_APP_GOOGLE_FONT_API_KEY = 'AIzaSyBSGaurJw4doiyDDoAlK0S29d2fjRxr5RE'
-    const apiKey = REACT_APP_GOOGLE_FONT_API_KEY
+    const apiKey = process.env.REACT_APP_GOOGLE_FONT_API_KEY
     const fonts = ['Open+Sans', 'Roboto',
       'DynaPuff', 'Pacifico', 'Delius', 'Comic Relief', 'Meow Script', 'Delius Unicase', 'Emilys Candy'
     ]
