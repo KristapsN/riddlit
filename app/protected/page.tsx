@@ -44,7 +44,7 @@ import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { firstTemplate, secondTemplate, thirdTemplate } from "@/helpers/layoutTemplates";
-
+import {fontCall} from "@/helpers/getFonts"
 
 const Paper = dynamic(() => import('../../components/Paper'), {
   ssr: false,
@@ -637,19 +637,6 @@ export default function Maze() {
     { name: '5.5 x 8.5', size: [396, 612] },
   ]
 
-  const fontCall = async () => {
-    const apiKey = process.env.REACT_APP_GOOGLE_FONT_API_KEY
-    const fonts = ['Open+Sans', 'Roboto',
-      'DynaPuff', 'Pacifico', 'Delius', 'Comic Relief', 'Meow Script', 'Delius Unicase', 'Emilys Candy'
-    ]
-    const fontUrlBase = [`https://www.googleapis.com/webfonts/v1/webfonts?key=${apiKey}`]
-    fonts.map((font) => { fontUrlBase.push(`&family=${font}`) })
-    const response = await fetch(fontUrlBase.join(''))
-    const data = await response.json()
-
-    return data
-  }
-
   useEffect(() => {
     fontCall().then((data) => {
       // @ts-ignore
@@ -796,9 +783,9 @@ export default function Maze() {
 
     const gridFromProps = newPageGridWithProps.map(({ gridArray }) => gridArray)
     const textFromProps = newPageGridWithProps.map(({ newTextArea }) => newTextArea)
-    const gameGridSizeFromProps = newPageGridWithProps.map(({ newGameGridSize }) => newGameGridSize)
-    // @ts-ignore
-    setGameGridSize([...gameGridSize, ...gameGridSizeFromProps.flat() ?? []])
+    // const gameGridSizeFromProps = newPageGridWithProps.map(({ newGameGridSize }) => newGameGridSize)
+    // // @ts-ignore
+    // setGameGridSize([...gameGridSize, ...gameGridSizeFromProps.flat() ?? []])
     //  @ts-ignore
     setTextAreaText([...textFromProps.flat() ?? []])
     setTexts([...newInputTexts.flat() ?? []])
