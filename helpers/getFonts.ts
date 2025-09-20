@@ -1,6 +1,6 @@
 export const fontCall = async () => {
-  const apiKey = process.env.NEXT_GOOGLE_FONT_API_KEY
-  console.log('apiKey', apiKey)
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_FONT_API_KEY
+
   const fonts = ['Open+Sans', 'Roboto',
     'DynaPuff', 'Pacifico', 'Delius', 'Comic Relief', 'Meow Script', 'Delius Unicase', 'Emilys Candy'
   ]
