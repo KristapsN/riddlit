@@ -103,18 +103,18 @@ export const handleExport = ({ pdfSize, pages, createGrid, images, showAnswerLis
         pdf.setDrawColor(grid[0].answerColor)
         pdf.rect(
           grid[0].answerX * widthDifference + xPosition,
-          ((grid[0].answerY * heightDifference) + (yPosition) * (grid[0].answerH * heightDifference) / grid[0].answerList.length),
-          (grid[0].answerH * heightDifference / grid[0].answerList.length - 10),
-          (grid[0].answerH * heightDifference / grid[0].answerList.length - 10)
+          ((grid[0].answerY * heightDifference) + (yPosition) * (grid[0].answerH *  heightDifference * grid[0].answerColumns) / grid[0].answerList.length),
+          (grid[0].answerH * grid[0].answerColumns * heightDifference / grid[0].answerList.length - 10),
+          (grid[0].answerH * grid[0].answerColumns * heightDifference / grid[0].answerList.length - 10)
         )
         pdf.setFont(grid[0].answerFont)
-        const fontSize = grid[0].answerH * heightDifference / answerList.length - 10
+        const fontSize = grid[0].answerH * grid[0].answerColumns * heightDifference / answerList.length - 10
 
         pdf.setTextColor(grid[0].answerColor)
         pdf.setFontSize(fontSize / 0.75)
         pdf.text(answer,
-          (grid[0].answerX * widthDifference + (grid[0].answerH * heightDifference) / answerList.length + xPosition),
-          ((grid[0].answerY * heightDifference) + (yPosition) * (grid[0].answerH * heightDifference) / answerList.length + (fontSize * 0.8)),
+          (grid[0].answerX * widthDifference + (grid[0].answerH * heightDifference * grid[0].answerColumns) / answerList.length + xPosition),
+          ((grid[0].answerY * heightDifference) + (yPosition) * (grid[0].answerH * heightDifference * grid[0].answerColumns) / answerList.length + (fontSize * 0.8)),
         );
       })
     }

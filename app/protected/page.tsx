@@ -632,7 +632,7 @@ export default function Maze() {
   const pdfSizesList: pdfSizesListProps[] = [
     { name: 'A4', size: [595.28, 841.89] },
     { name: '8.5 x 11', size: [612, 792] },
-    { name: '8 x 10', size: [576, 720] },
+    // { name: '8 x 10', size: [576, 720] },
     { name: '6 x 9', size: [432, 648] },
     { name: '5.5 x 8.5', size: [396, 612] },
   ]
@@ -650,13 +650,12 @@ export default function Maze() {
 
 
   const [openedToolPage, setOpenedToolPage] = useState('page')
-
   const addPage = (pageNumbers: any[]) => {
+
     const newPages = [
       // ...pages,
       ...pageNumbers
     ]
-
     const [...newPageGridWithProps] = createGridWithProps.filter((item) => item[0].pageNumber === '1').map((item, indx) => {
       const idsArray = pageNumbers.map(() => {
         return (
@@ -882,6 +881,18 @@ export default function Maze() {
     setTextAreaText([...textAreaText, ...newTextArea])
     setCreateGridWithProps([...createGridWithProps, ...newPageGridWithProps])
     setTexts(newTexts)
+
+    const newPages = [
+      ...pages.filter(({pageNumber}) => pageNumber !== currentPage),
+      {
+        pageNumber: currentPage,
+        wordMazeArray: newPageGridWithProps,
+        text: newTexts.filter(({pageNumber}) => pageNumber === currentPage),
+        image: []
+      }
+    ]
+
+    setPages(newPages)
   }
 
   return (
@@ -1015,12 +1026,14 @@ export default function Maze() {
                     <Button
                       variant='contained'
                       onClick={() =>
-                        addPage([{
-                          pageNumber: (pages.length + 1).toString(),
-                          // text: [],
-                          // wordMazeArray: [],
-                          // image: []
-                        }])
+                        // addPage([{
+                        //   pageNumber: (pages.length + 1).toString(),
+                        //   // text: [],
+                        //   // wordMazeArray: [[]],
+                        //   // image: []
+                        // }])
+                        
+                        setPages([...pages, {pageNumber: (pages.length + 1).toString()}])
                       }
                       size='small'
                       startIcon={<AddIcon />}
