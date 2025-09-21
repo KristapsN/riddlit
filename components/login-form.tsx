@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleSignInButton } from "./google-button"
 
 export function LoginForm({
   className,
@@ -46,7 +47,8 @@ export function LoginForm({
       setIsLoading(false);
     }
   };
-  const handleLoginSocial = async () => {
+  const handleLoginSocial = async (e: React.FormEvent<Element>) => {
+    e.preventDefault();
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
@@ -122,7 +124,15 @@ export function LoginForm({
               </Link>
             </div>
           </form>
-          <button type="button" onClick={handleLoginSocial}>Google</button>
+          <div className="mt-4 text-center text-sm mb-4">
+            <CardDescription>or</CardDescription>
+          </div>
+          <div className="flex items-center justify-center">
+            <GoogleSignInButton
+              onClick={handleLoginSocial}
+              label="Sign in with Google"
+              />
+          </div>
         </CardContent>
       </Card>
     </div>

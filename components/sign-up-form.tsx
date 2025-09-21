@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleSignInButton } from "./google-button"
 
 export function SignUpForm({
   className,
@@ -137,7 +138,15 @@ export function SignUpForm({
               </Link>
             </div>
           </form>
-          <button onClick={handleSignUpSocial}>Google</button>
+          <div className="mt-4 text-center text-sm mb-4">
+            <CardDescription>or</CardDescription>
+          </div>
+          <div className="flex items-center justify-center">
+            <GoogleSignInButton
+              onClick={handleSignUpSocial}
+              label="Sign up with Google"
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
