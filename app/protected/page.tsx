@@ -44,7 +44,7 @@ import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { firstTemplate, secondTemplate, thirdTemplate } from "@/helpers/layoutTemplates";
-import {fontCall} from "@/helpers/getFonts"
+import { fontCall } from "@/helpers/getFonts"
 
 const Paper = dynamic(() => import('../../components/Paper'), {
   ssr: false,
@@ -73,6 +73,7 @@ export interface MazeTextsProps {
   mazeBorderColor: string
   mazeFont: string
   mazeColor: string
+  randomLetterList: string
 }
 
 type pdfSizesListProps = {
@@ -111,6 +112,7 @@ export interface GridWithPropsProps {
   mazeBorderColor: string
   mazeFont: string
   mazeColor: string
+  randomLetterList: string
 }
 
 export interface ImagesProps {
@@ -202,6 +204,7 @@ export default function Maze() {
   const [puzzleDescriptionForAi, setPuzzleDescriptionForAi] = useState<string>('');
   const [loadAiCall, setLoadAiCall] = useState<boolean>(false);
   const [missingWordErrors, setMissingWordErrors] = useState(false);
+  const [randomLetterList, setRandomLetterList] = useState('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
   const maxNumber = 69;
   const drawerWidth = 140;
@@ -244,7 +247,7 @@ export default function Maze() {
     textArray: string[],
     wordListIndex: number,
     gridSize: number,
-    textAreaText: TextsProps[]
+    textAreaText: MazeTextsProps[]
   ) => {
     let newLetterGrid
     let newLetterGridWithProps
@@ -256,7 +259,7 @@ export default function Maze() {
       return Math.max(...arr.map(str => str.length));
     }
     const foundGridWithProps = createGridWithProps.find((item) => item[0].id === id);
-    
+
     if (foundGridWithProps) {
       newLetterGrid = [...createGrid]
       foundGridWithProps[0].answerList = filterAnswerArray(answers)
@@ -273,7 +276,6 @@ export default function Maze() {
       newLetterGridWithProps = [...createGridWithProps]
     } else {
       newLetterGrid = [...createGrid, [...grid]];
-          console.log('id', id, 'newLetterGrid', newLetterGrid)
       newLetterGridWithProps = [...createGridWithProps, [{
         id,
         grid,
@@ -290,20 +292,14 @@ export default function Maze() {
         answerW: findLongestStringLength(filterAnswerArray(answers)) * 10 * (textAreaText.find((item) => item.id === id)?.answerColumns * 1.4),
         // @ts-ignore
         answerH: filterAnswerArray(answers).length * 20 / textAreaText.find((item) => item.id === id)?.answerColumns,
-        // @ts-ignore
         answerColumns: textAreaText.find((item) => item.id === id)?.answerColumns ?? 1,
-        // @ts-ignore
         answerFont: textAreaText.find((item) => item.id === id)?.answerFont ?? 'Roboto',
-        // @ts-ignore
         answerColor: textAreaText.find((item) => item.id === id)?.answerColor ?? '#000000',
-        // @ts-ignore
         mazeBorderSize: textAreaText.find((item) => item.id === id)?.mazeBorderSize ?? 2,
-        // @ts-ignore
         mazeBorderColor: textAreaText.find((item) => item.id === id)?.mazeBorderColor ?? 'black',
-        // @ts-ignore
         mazeFont: textAreaText.find((item) => item.id === id)?.mazeFont ?? 'Roboto',
-        // @ts-ignore
-        mazeColor: textAreaText.find((item) => item.id === id)?.mazeColor ?? '#000000'
+        mazeColor: textAreaText.find((item) => item.id === id)?.mazeColor ?? '#000000',
+        randomLetterList: textAreaText.find((item) => item.id === id)?.randomLetterList ?? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       }]]
     }
 
@@ -322,9 +318,9 @@ export default function Maze() {
       answers = fillInHorizontalAnswer(unusedWords, answers, filteredHorizontalFreeSpaces);
     }
 
-    const unusedCells = grid.filter((item: { letter: string | undefined }) => item.letter === '' || item.letter === undefined || item.letter === ' ');
+    // const unusedCells = grid.filter((item: { letter: string | undefined }) => item.letter === '' || item.letter === undefined || item.letter === ' ');
 
-    unusedCells.forEach((item: { letter: string }) => { item.letter = randomLetterGenerator() })
+    // unusedCells.forEach((item: { letter: string }) => { item.letter = randomLetterGenerator() })
 
     setCreateGridWithProps(newLetterGridWithProps)
     setCreateGrid(newLetterGrid)
@@ -337,52 +333,53 @@ export default function Maze() {
     gridIndex: number,
     textArray: string[],
     size: number,
-    textAreaText: TextsProps[],
+    textAreaText: MazeTextsProps[],
     initialX?: number,
     initialY?: number
   ) => {
     // textAreaText.toUpperCase().split((/\s+/)).filter((word: string) => word !== '')
 
     // for (let i = 0; i < 1; i += 1) {
-      const emptyGrid = generateGrid(size, initialX, initialY)
+    const emptyGrid = generateGrid(size, initialX, initialY)
 
-      if (createGrid[gridIndex]) {
+    if (createGrid[gridIndex]) {
+      // @ts-ignore
+      answers = Words(createGrid[gridIndex] = emptyGrid, textArray, size, textAreaText.find((item) => item.id === id)?.randomLetterList)
+      // answers = generateWordSearchMaze(createGrid[gridIndex], textArray, size)
+    } else {
+      // @ts-ignore
+      answers = Words(emptyGrid, textArray, size, textAreaText.find((item) => item.id === id)?.randomLetterList)
+      // answers = generateWordSearchMaze(emptyGrid, textArray, size)
+    }
+
+
+
+    let newGrid1 = [[]]
+    let answers1
+    if (textArray.length !== 0 && textArray.length === answers.length) {
+      if (createGrid[0]) {
+        const { answers, newGrid } = fillGridWithLetters(id, createGrid[gridIndex] = emptyGrid, textArray, gridIndex, size, textAreaText)
         // @ts-ignore
-        answers = Words(createGrid[gridIndex] = emptyGrid, textArray, size)
-        // answers = generateWordSearchMaze(createGrid[gridIndex], textArray, size)
+        newGrid1 = newGrid
+        answers1 = answers
       } else {
+        const { answers, newGrid } = fillGridWithLetters(id, emptyGrid, textArray, gridIndex, size, textAreaText)
         // @ts-ignore
-        answers = Words(emptyGrid, textArray, size)
-
-        // answers = generateWordSearchMaze(emptyGrid, textArray, size)
+        newGrid1 = newGrid
+        answers1 = answers
       }
 
-      let newGrid1 = [[]]
-      let answers1
-      if (textArray.length !== 0 && textArray.length === answers.length) {
-        console.log('createGrid[gridIndex]',createGrid, createGrid[0])
-        if (createGrid[0]) {
-          const { answers, newGrid } = fillGridWithLetters(id, createGrid[gridIndex] = emptyGrid, textArray, gridIndex, size, textAreaText)
-          // @ts-ignore
-          newGrid1 = newGrid
-          answers1 = answers
-        } else {
-          const { answers, newGrid } = fillGridWithLetters(id, emptyGrid, textArray, gridIndex, size, textAreaText)
-          // @ts-ignore
-          newGrid1 = newGrid
-          answers1 = answers
-        }
+      // const answerArray = preFilteredAnswerArray.map((item: { letter: any }[]) => item.map(({ letter }) => letter).join(''))
+      // validAnswers.current = answerArray.filter((answer: any) => textArray.includes(answer))
 
-        // const answerArray = preFilteredAnswerArray.map((item: { letter: any }[]) => item.map(({ letter }) => letter).join(''))
-        // validAnswers.current = answerArray.filter((answer: any) => textArray.includes(answer))
+    }
+    // setSuccess(true);
 
-      }
-      // setSuccess(true);
+    // if (tooLongWords.length > 0) {
+    //   handleAlertOpen(`These words are too long: ${tooLongWords.join(', ')}`, 'warning');
+    // }
 
-      // if (tooLongWords.length > 0) {
-      //   handleAlertOpen(`These words are too long: ${tooLongWords.join(', ')}`, 'warning');
-      // }
-      return { grid: newGrid1[gridIndex], answers: answers1 }
+    return { grid: newGrid1[gridIndex], answers: answers1 }
     // }
   }
 
@@ -434,7 +431,8 @@ export default function Maze() {
       mazeBorderSize: 2,
       mazeBorderColor: 'black',
       mazeFont: 'Roboto',
-      mazeColor: '#000000'
+      mazeColor: '#000000',
+      randomLetterList: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     }]
     setGamGridSize(newGameGridSize)
     return setTextAreaText(newTexts)
@@ -592,6 +590,7 @@ export default function Maze() {
 
     setTexts(newTexts)
   }
+
   const handleFontFamily = (event: SelectChangeEvent<string>, id: string) => {
     const newTexts = [...texts]
     const foundText = texts.find((item) => item.id === id);
@@ -600,6 +599,21 @@ export default function Maze() {
     }
 
     setTexts(newTexts)
+  }
+
+  const handleMazeRandomLetterList = (letters: string, id: string) => {
+    const newCreateGridWithProps = [...textAreaText]
+    const newFullGrid = [...createGridWithProps]
+    const foundGrid = textAreaText.find((item) => item.id === id);
+    const foundFullGrid = createGridWithProps.find((item) => item[0].id === id);
+    if (foundFullGrid) {
+      foundFullGrid[0].randomLetterList = letters;
+      setCreateGridWithProps(newFullGrid)
+    }
+    if (foundGrid) {
+      foundGrid.randomLetterList = letters;
+    }
+    setMazeProps(newCreateGridWithProps)
   }
 
   const addTextField = () => {
@@ -673,6 +687,7 @@ export default function Maze() {
         mazeBorderColor: string;
         mazeFont: string;
         mazeColor: string;
+        randomLetterList: string;
       }, index: string | number) => {
         return (
           {
@@ -686,7 +701,8 @@ export default function Maze() {
             mazeBorderSize: textAreaText[0].mazeBorderSize,
             mazeBorderColor: textAreaText[0].mazeBorderColor,
             mazeFont: textAreaText[0].mazeFont,
-            mazeColor: textAreaText[0].mazeColor
+            mazeColor: textAreaText[0].mazeColor,
+            randomLetterList: textAreaText[0].randomLetterList
           }
         )
       })
@@ -805,10 +821,10 @@ export default function Maze() {
     // ])
     setPages(newPages)
   }
-// @ts-ignore
+  // @ts-ignore
   const addTemplatePage = ({ text, wordMazeArray }) => {
     const newTexts = [...texts]
-// @ts-ignore
+    // @ts-ignore
     text.map((item) => {
       newTexts.push(
         {
@@ -824,7 +840,7 @@ export default function Maze() {
         }
       )
     })
-// @ts-ignore
+    // @ts-ignore
     const [...newGameGridSize] = wordMazeArray.map((item) => {
       return (
         {
@@ -833,7 +849,7 @@ export default function Maze() {
           pageNumber: currentPage,
         })
     })
-// @ts-ignore
+    // @ts-ignore
     const [...newTextArea] = wordMazeArray.map((item) => {
       return (
         {
@@ -850,7 +866,7 @@ export default function Maze() {
         })
 
     })
-// @ts-ignore
+    // @ts-ignore
     const [...newPageGridWithProps] = wordMazeArray.map((item) => {
       const mazeData = generateWordSearch(item.id, 0, item.answerArray, 10, newTextArea)
       return ([{
@@ -883,11 +899,11 @@ export default function Maze() {
     setTexts(newTexts)
 
     const newPages = [
-      ...pages.filter(({pageNumber}) => pageNumber !== currentPage),
+      ...pages.filter(({ pageNumber }) => pageNumber !== currentPage),
       {
         pageNumber: currentPage,
         wordMazeArray: newPageGridWithProps,
-        text: newTexts.filter(({pageNumber}) => pageNumber === currentPage),
+        text: newTexts.filter(({ pageNumber }) => pageNumber === currentPage),
         image: []
       }
     ]
@@ -985,7 +1001,10 @@ export default function Maze() {
                   </List> */}
                 </Box>
               </Drawer>
-              <Box component="main" sx={{ flexGrow: 1, p: 3, width: '500px' }}>
+              <Box component="main" sx={{
+                flexGrow: 1, p: 3,
+                minWidth: '500px'
+              }}>
                 {openedToolPage === 'page' &&
                   <>
                     <Box sx={{ mb: '1rem' }}>
@@ -1008,21 +1027,40 @@ export default function Maze() {
                         )}
                       </ButtonGroup>
                     </Box>
-                    <Button onClick={() => {
-                      addTemplatePage(firstTemplate(pdfPreviewHeight, pdfSize))
-                    }}>
-                      Add template 1
-                    </Button>
-                    <Button onClick={() => {
-                      addTemplatePage(secondTemplate(pdfPreviewHeight, pdfSize))
-                    }}>
-                      Add template 2
-                    </Button>
-                    <Button onClick={() => {
-                      addTemplatePage(thirdTemplate(pdfPreviewHeight, pdfSize))
-                    }}>
-                      Add template 3
-                    </Button>
+
+                    <Box sx={{ marginTop: '10px', marginBottom: '20px' }}>
+                      <FormLabel sx={{ display: 'block', marginBottom: '10px' }}>Templates</FormLabel>
+                      <Button onClick={() => {
+                        addTemplatePage(firstTemplate(pdfPreviewHeight, pdfSize))
+                      }}>
+                        <img
+                          src={'/template_1.png'}
+                          alt=""
+                          draggable="true"
+                          style={{ borderRadius: '10px', maxWidth: '200px', maxHeight: '200px' }}
+                        />
+                      </Button>
+                      <Button onClick={() => {
+                        addTemplatePage(secondTemplate(pdfPreviewHeight, pdfSize))
+                      }}>
+                        <img
+                          src={'/template_2.png'}
+                          alt=""
+                          draggable="true"
+                          style={{ borderRadius: '10px', maxWidth: '200px', maxHeight: '200px' }}
+                        />
+                      </Button>
+                      <Button onClick={() => {
+                        addTemplatePage(thirdTemplate(pdfPreviewHeight, pdfSize))
+                      }}>
+                        <img
+                          src={'/template_3.png'}
+                          alt=""
+                          draggable="true"
+                          style={{ borderRadius: '10px', maxWidth: '200px', maxHeight: '200px' }}
+                        />
+                      </Button>
+                    </Box>
                     <Button
                       variant='contained'
                       onClick={() =>
@@ -1032,8 +1070,8 @@ export default function Maze() {
                         //   // wordMazeArray: [[]],
                         //   // image: []
                         // }])
-                        
-                        setPages([...pages, {pageNumber: (pages.length + 1).toString()}])
+
+                        setPages([...pages, { pageNumber: (pages.length + 1).toString() }])
                       }
                       size='small'
                       startIcon={<AddIcon />}
@@ -1309,10 +1347,9 @@ export default function Maze() {
                                 If in theme description include different rules for content, please follow them.`
 
                                 return geminiAiCall(descriptionBase).then((response) => {
-                                  console.log('response', response)
-// @ts-ignore
+                                  // @ts-ignore
                                   const pageArray: any[] | PromiseLike<any[]> = [];
-                                  {/* @ts-ignore */}
+                                  {/* @ts-ignore */ }
                                   response.map((item, index) => {
                                     pageArray.push({
                                       pageNumber: (index + 1).toString(),
@@ -2057,6 +2094,32 @@ export default function Maze() {
                                     </Box>
                                   </Box>
                                 </Box>
+                                <Box sx={{ marginTop: '20px' }}>
+                                  <Accordion key={id}>
+                                    <AccordionSummary
+                                      expandIcon={<ExpandMoreIcon />}
+                                      aria-controls="panel1-content"
+                                      id="panel1-header"
+                                    >
+                                      <Typography component="span">Maze letters</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+
+                                      <TextField
+                                        sx={{ width: '100%' }}
+                                        type='string'
+                                        // value={randomLetterList}
+                                        // onChange={(e) => setRandomLetterList(e.target.value)}
+
+                                        value={textAreaText.find((item) => item.id === id)?.randomLetterList}
+                                        onChange={(e) => handleMazeRandomLetterList(e.target.value, id)}
+                                      />
+
+                                    </AccordionDetails>
+                                  </Accordion>
+                                </Box>
+
+
                               </Box>
                               <Box sx={{ marginTop: '10px', display: 'flex', justifyContent: 'flex-end', marginBottom: ' 10px' }}>
                                 <Button
@@ -2188,7 +2251,7 @@ export default function Maze() {
                   sx={{
                     '&.MuiButton-contained': {
                       backgroundColor: '#FFFF48',
-                      color: 'black',
+                      color: 'rgb(0 0 0 / 75%);',
                       borderRadius: '5px',
                       padding: '15px 20px',
                       height: '40px'
