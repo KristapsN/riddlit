@@ -226,6 +226,7 @@ export default function Maze() {
   const [selectedProject, setSelectedProject] = useState(null)
   const [tokenBalance, setTokenBalance] = useState(0)
   const [contentLoading, setContentLoading] = useState(true)
+  const [didNotGenerate, setDidNotGenerate] = useState()
 
   const handlePdfSizeChange = (size: pdfSizesListProps['size']) => {
     setPdfSize(size)
@@ -307,7 +308,7 @@ export default function Maze() {
 
         const textArea: any[] = []
         project.project_data.map(({ wordMazeArray }) => {
-        // @ts-ignore
+          // @ts-ignore
           wordMazeArray?.map((item, index) => {
             if (item.length === 0) {
               return;
@@ -397,7 +398,7 @@ export default function Maze() {
         email: user?.email,
         hash: '' // See note below about "Secure Mode"
       });
-// @ts-ignore
+      // @ts-ignore
       getProjects(supabase, user.id).then((response) => {
         console.log('res', response)
         setProjects(response)
@@ -591,11 +592,11 @@ export default function Maze() {
 
     if (createGrid[gridIndex]) {
       // @ts-ignore
-      answers = Words(createGrid[gridIndex] = emptyGrid, textArray, size, textAreaText.find((item) => item.id === id)?.randomLetterList)
+      answers = Words(createGrid[gridIndex] = emptyGrid, textArray, size, textAreaText.find((item) => item.id === id)?.randomLetterList, setDidNotGenerate)
       // answers = generateWordSearchMaze(createGrid[gridIndex], textArray, size)
     } else {
       // @ts-ignore
-      answers = Words(emptyGrid, textArray, size, textAreaText.find((item) => item.id === id)?.randomLetterList)
+      answers = Words(emptyGrid, textArray, size, textAreaText.find((item) => item.id === id)?.randomLetterList, setDidNotGenerate)
       // answers = generateWordSearchMaze(emptyGrid, textArray, size)
     }
 
@@ -1426,7 +1427,12 @@ export default function Maze() {
                     <Typography sx={{ color: 'white', textAlign: 'right' }}>Tokens: {tokenBalance}</Typography>
                   </Box>
                 </Box> */}
-
+                {didNotGenerate &&
+                  <Alert sx={{ width: '90%' }} severity="warning"
+                  onClose={() => setDidNotGenerate(undefined)}>
+                    {didNotGenerate}
+                  </Alert>
+                }
                 <Box sx={{ pl: 3 }}>
 
                   {openedToolPage === 'page' &&
@@ -1616,7 +1622,7 @@ export default function Maze() {
                                 answerArray: textAreaText[index]?.value
                               })
                             })
-// @ts-ignore
+                            // @ts-ignore
                             const texts = pages[0]?.text.map((txt) => {
                               return (
                                 {
@@ -1625,7 +1631,7 @@ export default function Maze() {
                                 }
                               )
                             })
-// @ts-ignore
+                            // @ts-ignore
                             addTemplatePage({
                               wordMazeArray: mazes && mazes?.flat(),
                               text: texts && texts?.flat(),
@@ -3039,7 +3045,7 @@ export default function Maze() {
                                       <Typography sx={{ color: 'grey', fontSize: '14px' }}>Maze border color</Typography>
                                       {/* @ts-ignore */}
                                       <ColorPicker
-                                      // @ts-ignore
+                                        // @ts-ignore
                                         color={crosswordText.find((item) => item.id === id)?.mazeBorderColor}
                                         onChange={(color) => handleCrosswordBorderColor(color, id)
                                         } />

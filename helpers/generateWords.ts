@@ -6,7 +6,7 @@ function isSafeToPlace(
   y: number,
   size: number,
   wordsToAvoid: string[],
-  getCellAt: (x: number, y: number) => GridCellProps | undefined
+  getCellAt: (x: number, y: number) => GridCellProps | undefined,
 ): boolean {
   const allDirections = [
     { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 },
@@ -56,7 +56,7 @@ function isSafeToPlace(
   return true; // It's safe to place the letter.
 }
 
-function Words(grid: GridCellProps[], words: string[], size: number, fillerLetters?: string): GridCellProps[][] | { error: string } {
+function Words(grid: GridCellProps[], words: string[], size: number, fillerLetters?: string, setDidNotGenerate?: React.Dispatch<React.SetStateAction<undefined| string>>): GridCellProps[][] | { error: string } {
   // Clone the grid to not modify the original
   const workingGrid = [...grid];
   const directions = [
@@ -169,6 +169,7 @@ function Words(grid: GridCellProps[], words: string[], size: number, fillerLette
     if (placed) {
       result.push(placedCells);
     } else {
+      setDidNotGenerate && setDidNotGenerate(`Could not place word: ${word}. Please regenerate the puzzle or adjust words in the list.`)
       console.warn(`Could not place word: ${word}`);
     }
   }
