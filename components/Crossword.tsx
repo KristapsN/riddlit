@@ -84,7 +84,6 @@ export const Crossword = ({
 
             const maxXYSize = findMaxCoordinates(crosswordPuzzle.grid)
             const maxSize = maxXYSize.x > maxXYSize.y ? maxXYSize.x + 1 : maxXYSize.y + 1
-            console.log('maxSize', maxSize)
             // @ts-ignore
             const currentSquareWidth = crosswordPuzzle.w / maxSize
             // crosswordPuzzle.gridSize

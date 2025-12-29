@@ -61,7 +61,6 @@ const Paper = forwardRef((
 
   const history = useRef([]);
   const historyStep = useRef(0);
-console.log('selectedId', selectedId)
   useEffect(() => {
     !isImageSelected && selectShape(null)
   }, [isImageSelected])
@@ -270,7 +269,6 @@ console.log('selectedId', selectedId)
                 isSelected={`crossword${crossword.id}` === selectedId}
                 // @ts-ignore
                 onSelect={(id) => {
-                  console.log('id', id)
                   id === 'crossword' && selectShape(`crossword${crossword.id}`);
                   setOpenedToolPage('crossword')
                   setSelectedAccordion(crossword.id)
