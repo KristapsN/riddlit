@@ -73,6 +73,7 @@ export default function PricingPage() {
                 alignItems: 'center',
                 width: '12rem',
                 height: '10rem',
+                background: '#f5f5f5'
               }}
             >
               {Logo}

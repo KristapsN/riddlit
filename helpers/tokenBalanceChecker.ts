@@ -36,8 +36,6 @@ export async function checkTokenBalance(userId: string): Promise<number> {
     .eq('user_id', userId)
     .single();
 
-    console.log('data', data, 'error', error)
-
   if (error || !data) {
     // If user doesn't exist in credits table, create them with starter tokens
     if (error?.code === 'PGRST116') { // Code for "No rows found"

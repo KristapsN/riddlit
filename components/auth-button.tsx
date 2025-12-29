@@ -10,8 +10,6 @@ export async function AuthButton() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log("USER", supabase.auth);
-
   return user ? (
     <div className="flex items-center gap-4">
       {/* Hey,  */}

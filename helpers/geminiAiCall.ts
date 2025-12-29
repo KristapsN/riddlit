@@ -91,7 +91,6 @@ export async function geminiAiCallWithTracking(contents: string, userId: string,
     };
 
     const result = await ai.models.generateContent(model);
-    console.log('result', result.text)
     // const response = await result.response;
 
     const usage = result.usageMetadata;

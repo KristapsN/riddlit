@@ -258,7 +258,6 @@ export default function Maze() {
 
         setTokenBalance(tokenBalance)
 
-        console.log('response', response)
         if (!response || (response && response.length === 0)) {
           setOpenCreateProject(true)
           return;
@@ -282,7 +281,6 @@ export default function Maze() {
         setOpenCreateProject(false)
         setPages([...project.project_data])
         const maze = project.project_data.map(({ wordMazeArray }) => {
-          console.log('wordMazeArray ?? maze', wordMazeArray)
           return wordMazeArray;
         })
 
@@ -359,8 +357,6 @@ export default function Maze() {
         gridSize[0] && setGamGridSize([...gridSize])
         textArea[0] ? setTextAreaText([...textArea]) : setTextAreaText([])
 
-        console.log('textArea[0]', textArea[0], 'textArea', textArea, 'maze.flat()', maze.flat())
-
         const crosswordArray = project.project_data.map(({ crossword }) => {
           return crossword;
         })
@@ -374,7 +370,6 @@ export default function Maze() {
         pdfPagSize && setPdfSize(pdfPagSize)
         pdfPagSize && (pageSize.current = pdfPagSize)
 
-        console.log('texts', texts)
         texts[0].length ? setTexts([...texts.flat()]) : setTexts([])
 
       }).catch((error) => {
@@ -400,7 +395,6 @@ export default function Maze() {
       });
       // @ts-ignore
       getProjects(supabase, user.id).then((response) => {
-        console.log('res', response)
         setProjects(response)
         setOpenCreateProject(false)
       })
@@ -1206,7 +1200,6 @@ export default function Maze() {
     // @ts-ignore
     const [...newPageGridWithProps] = wordMazeArray ? wordMazeArray?.map((item) => {
       const mazeData = generateWordSearch(item.id, 0, item.answerArray, 10, newTextArea)
-      console.log('nextPageNumber', nextPageNumber)
       return ([{
         id: item.id,
         grid: mazeData?.grid ?? [],
@@ -1987,8 +1980,6 @@ export default function Maze() {
                                   return geminiAiCallWithTracking(descriptionBase, activeUser.current, setTokenBalance).then((response) => {
                                     // @ts-ignore
                                     const pageArray: any[] | PromiseLike<any[]> = [];
-                                    {/* @ts-ignore */ }
-                                    console.log('response cost', response)
                                     // @ts-ignore
                                     response.data.map((item, index) => {
                                       pageArray.push({
