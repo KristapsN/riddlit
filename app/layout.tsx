@@ -9,8 +9,8 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Riddleit | The Puzzle Creator’s Playground",
-  description: "Design beautiful, high-quality puzzle books with Riddleit. Total control over colors, sizes, and layouts for word mazes and crosswords. Prove your skills and solve the maze to enter"
-
+  description: "Design beautiful, high-quality puzzle books with Riddleit. Total control over colors, sizes, and layouts for word mazes and crosswords. Prove your skills and solve the maze to enter",
+}
 import { Roboto } from 'next/font/google'
 
 const roboto = Roboto({
