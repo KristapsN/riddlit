@@ -65,7 +65,7 @@ export default function PricingPage() {
     <>
       <Grid container sx={{ flexGrow: 1, backgroundColor: '#FCD0F4', height: "100%" }}>
         <Grid item xs={12} sm={12} md={12} lg={12}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: "100%", marginLeft: '10px',  marginRight: '10px' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: "100%", marginLeft: '10px', marginRight: '10px' }}>
             <Box
               sx={{
                 display: 'flex',
@@ -79,13 +79,13 @@ export default function PricingPage() {
             </Box>
             <Typography sx={{ textAlign: 'center', color: '#FCD0F4', background: '#000000ff', padding: '5px', marginBottom: '2px' }}>Crafted by solvers, for solvers. Design the riddles you'd love to crack.</Typography>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Typography sx={{ color: '#FCD0F4', background: '#000000ff', padding: '5px' }}>The password </Typography>
               <Typography sx={{ textWrap: 'nowrap', color: '#fcf81bff', background: '#333333', padding: '10px', margin: '10px' }}>??RIDDLE?</Typography>
               <Typography sx={{ color: '#FCD0F4', background: '#000000ff', padding: '5px' }}> is fractured. Seek the missing characters within the Word Maze to mend the key.</Typography>
             </Box>
 
-             <TextField
+            <TextField
               value={riddleName}
               onChange={(e) => setRiddleName(e.target.value)}
               sx={{
@@ -107,7 +107,7 @@ export default function PricingPage() {
                 : <img src='/image.png' width={'500px'} />
               }
             </Box>
-           
+
           </Box>
         </Grid>
       </Grid>
