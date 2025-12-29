@@ -82,6 +82,7 @@ export const ImageElement: React.FC<ImageElementProps> = ({
         height={image.h}
         onClick={onSelect}
         onTap={onSelect}
+        onMouseDown={onSelect}
         // @ts-ignore
         ref={shapeRef}
         {...shapeProps}

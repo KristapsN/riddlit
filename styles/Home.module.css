@@ -322,8 +322,9 @@
   animation: l2 2s linear infinite;
   margin-top: 30px;
   margin-bottom: 30px;
-
+  color: #ffffff;
 }
+
 .loader:before {
   content:"Loading..."
 }

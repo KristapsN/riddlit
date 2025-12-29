@@ -59,6 +59,7 @@ const TextComponent: React.FC<TextComponentProps> = ({
         width={width}
         onClick={onSelect}
         onTap={onSelect}
+        onMouseDown={onSelect}
         // @ts-ignore
         ref={textRef}
         perfectDrawEnabled={false}

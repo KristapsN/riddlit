@@ -23,7 +23,7 @@ export default function ProtectedLayout({
           {children}
         {/* </div> */}
 
-        <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-4 py-8">
+        {/* <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-4 py-8"> */}
           {/* <p>
             Powered by{" "}
             <a
@@ -36,7 +36,7 @@ export default function ProtectedLayout({
             </a>
           </p> */}
           {/* <ThemeSwitcher /> */}
-        </footer>
+        {/* </footer> */}
       </div>
     </main>
   );

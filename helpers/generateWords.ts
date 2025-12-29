@@ -184,7 +184,7 @@ function Words(grid: GridCellProps[], words: string[], size: number, fillerLette
   const fillerChars = (fillerLetters && fillerLetters.length > 0)
     ? [...new Set(fillerLetters.toUpperCase().split(''))] // Use provided letters, ensure no duplicates
     : "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(''); // Default to all letters
-console.log('fillerLetters', fillerLetters)
+
   const emptyCells = workingGrid.filter(cell => !cell.letter);
 
   for (const cell of emptyCells) {

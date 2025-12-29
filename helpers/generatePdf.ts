@@ -1,6 +1,6 @@
 import jsPDF from "jspdf"
 import { ComicRelief, Delius, DeliusUnicase, DynaPuff, EmilysCandy, MeowScript, Pacifico, Roboto, OpenSans } from "../fonts/pdfFonts/AllFonts"
-import { GridWithPropsProps, ImageDraggedProps, PageElementProps, TextsProps } from "@/app/protected/page"
+import { CrosswordTextProps, GridWithPropsProps, ImageDraggedProps, PageElementProps, TextsProps } from "@/app/protected/page"
 import { getColumnIndices } from "./getColumnIndices"
 
 interface ExportProps {
@@ -12,9 +12,19 @@ interface ExportProps {
   images: ImageDraggedProps[]
   pdfSize: number[]
   pages: PageElementProps[]
+  fileName: string;
+  crosswordPuzzles: CrosswordTextProps[]
+}
+// @ts-ignore
+function findMaxCoordinates(arr) {
+  // @ts-ignore
+  return arr.reduce((max, obj) => ({
+    x: Math.max(max.x, obj.x),
+    y: Math.max(max.y, obj.y)
+  }), { x: -Infinity, y: -Infinity });
 }
 
-export const handleExport = ({ pdfSize, pages, createGrid, images, showAnswerList, texts, width, height }: ExportProps) => {
+export const handleExport = ({ pdfSize, pages, createGrid, images, showAnswerList, texts, width, height, fileName, crosswordPuzzles }: ExportProps) => {
   const pdf = new jsPDF({
     format: [pdfSize[0], pdfSize[1]],
     unit: 'px',
@@ -49,106 +59,6 @@ export const handleExport = ({ pdfSize, pages, createGrid, images, showAnswerLis
   const widthDifference = pdfSize[0] / width
   const heightDifference = pdfSize[1] / height
 
-  createGrid.map((grid) => {
-    pdf.setPage(parseInt(grid[0].pageNumber))
-    pdf.setLineWidth(grid[0].mazeBorderSize);
-    // @ts-ignore
-    const currentSquareWidth = grid[0].w / grid[0].gridSize * widthDifference
-    // @ts-ignore
-    const currentSquareHeight = grid[0].h / grid[0].gridSize * heightDifference
-
-    grid[0].grid.map(({ x, y, letter }) => {
-      const startCoordinatesX = (x / 10) * currentSquareWidth
-      const startCoordinatesY = (y / 10) * currentSquareWidth
-
-      pdf.setDrawColor(grid[0].mazeBorderColor)
-      pdf.setFont(grid[0].mazeFont)
-      pdf.rect(
-        (grid[0].x * widthDifference + startCoordinatesX),
-        (grid[0].y * heightDifference + startCoordinatesY),
-        currentSquareWidth,
-        currentSquareHeight,
-      )
-      pdf.setFontSize(currentSquareWidth * 0.6 / 0.75)
-      pdf.setTextColor(grid[0].mazeColor)
-      pdf.text(letter,
-        // @ts-ignore
-        ((grid[0].x * widthDifference) + startCoordinatesX + currentSquareWidth / 2 - context.measureText(letter).width / 4),
-        ((grid[0].y * heightDifference) + startCoordinatesY + currentSquareHeight / 2 + (currentSquareHeight / 5)),
-      )
-    })
-
-    if (showAnswerList) {
-
-      const answerList = grid[0].answerList.map(
-        (item: { letter: any }[]) => item.map(({ letter }) => letter).join('')
-      )
-
-      const breakpoints = getColumnIndices(answerList, grid[0].answerColumns)
-      let xPosition = 0
-      let yPosition = -1
-      let currentBreakpoint = 1
-
-      answerList.map((answer, index) => {
-        yPosition += 1
-        if (breakpoints[currentBreakpoint] === index) {
-          yPosition = 0
-          xPosition += grid[0].answerW / grid[0].answerColumns
-          currentBreakpoint += 1
-          if (breakpoints.length === currentBreakpoint) {
-            currentBreakpoint -= 1
-          }
-        }
-        pdf.setLineWidth(2);
-        pdf.setDrawColor(grid[0].answerColor)
-        pdf.rect(
-          grid[0].answerX * widthDifference + xPosition,
-          ((grid[0].answerY * heightDifference) + (yPosition) * (grid[0].answerH *  heightDifference * grid[0].answerColumns) / grid[0].answerList.length),
-          (grid[0].answerH * grid[0].answerColumns * heightDifference / grid[0].answerList.length - 10),
-          (grid[0].answerH * grid[0].answerColumns * heightDifference / grid[0].answerList.length - 10)
-        )
-        pdf.setFont(grid[0].answerFont)
-        const fontSize = grid[0].answerH * grid[0].answerColumns * heightDifference / answerList.length - 10
-
-        pdf.setTextColor(grid[0].answerColor)
-        pdf.setFontSize(fontSize / 0.75)
-        pdf.text(answer,
-          (grid[0].answerX * widthDifference + (grid[0].answerH * heightDifference * grid[0].answerColumns) / answerList.length + xPosition),
-          ((grid[0].answerY * heightDifference) + (yPosition) * (grid[0].answerH * heightDifference * grid[0].answerColumns) / answerList.length + (fontSize * 0.8)),
-        );
-      })
-    }
-  })
-  console.log('getLayers', texts)
-
-  texts.map((text) => {
-    pdf.setPage(parseInt(text.pageNumber))
-    const size = text.size / 0.75; // convert pixels to points
-    pdf.setFontSize(size);
-
-    pdf.setFont("Pacifico");
-    pdf.setFont("Meow Script");
-    pdf.setFont("Emilys Candy");
-    pdf.setFont("DynaPuff")
-    pdf.setFont("Delius Unicase")
-    pdf.setFont("Delius")
-    pdf.setFont("Comic Relief")
-    pdf.setFont("Roboto")
-    pdf.setFont("Open Sans")
-
-    pdf.setTextColor(text.color)
-    pdf.setFont(text.font)
-    pdf.text(
-      text.value,
-      text.initialPosition.x * widthDifference,
-      text.initialPosition.y * heightDifference,
-      {
-        baseline: 'top',
-        maxWidth: text.width
-        // angle: -text.getAbsoluteRotation(),
-      });
-  });
-
   images.map(({ x, y, src, w, h, pageNumber }) => {
     pdf.setPage(parseInt(pageNumber))
     pdf.addImage(
@@ -162,5 +72,168 @@ export const handleExport = ({ pdfSize, pages, createGrid, images, showAnswerLis
     )
   })
 
-  pdf.save("word_maze.pdf");
+  createGrid[0].length > 0 && createGrid.map((grid) => {
+    if (grid.length < 1) {
+      return;
+    };
+    pdf.setPage(parseInt(grid[0]?.pageNumber))
+
+    pdf.setLineWidth(grid[0]?.mazeBorderSize);
+    // @ts-ignore
+    const currentSquareWidth = grid[0]?.w / grid[0]?.gridSize * widthDifference
+    // @ts-ignore
+    const currentSquareHeight = grid[0]?.h / grid[0]?.gridSize * heightDifference
+
+    grid[0]?.grid.map(({ x, y, letter }) => {
+      const startCoordinatesX = (x / 10) * currentSquareWidth
+      const startCoordinatesY = (y / 10) * currentSquareWidth
+
+      pdf.setDrawColor(grid[0]?.mazeBorderColor)
+      pdf.setFont(grid[0]?.mazeFont)
+      pdf.rect(
+        (grid[0]?.x * widthDifference + startCoordinatesX),
+        (grid[0]?.y * heightDifference + startCoordinatesY),
+        currentSquareWidth,
+        currentSquareHeight,
+      )
+      pdf.setFontSize(currentSquareWidth * 0.6 / 0.75)
+      pdf.setTextColor(grid[0]?.mazeColor)
+      pdf.text(letter,
+        // @ts-ignore
+        ((grid[0]?.x * widthDifference) + startCoordinatesX + currentSquareWidth / 2 - context.measureText(letter).width / 4),
+        ((grid[0]?.y * heightDifference) + startCoordinatesY + currentSquareHeight / 2 + (currentSquareHeight / 5)),
+      )
+    })
+
+    if (showAnswerList) {
+
+      const answerList = grid[0]?.answerList.map(
+        (item: { letter: any }[]) => item.map(({ letter }) => letter).join('')
+      )
+
+      const breakpoints = getColumnIndices(answerList, grid[0]?.answerColumns)
+      let xPosition = 0
+      let yPosition = -1
+      let currentBreakpoint = 1
+
+      answerList.map((answer, index) => {
+        yPosition += 1
+        if (breakpoints[currentBreakpoint] === index) {
+          yPosition = 0
+          xPosition += grid[0]?.answerW / grid[0]?.answerColumns
+          currentBreakpoint += 1
+          if (breakpoints.length === currentBreakpoint) {
+            currentBreakpoint -= 1
+          }
+        }
+        pdf.setLineWidth(2);
+        pdf.setDrawColor(grid[0]?.answerColor)
+        pdf.rect(
+          grid[0]?.answerX * widthDifference + xPosition,
+          ((grid[0]?.answerY * heightDifference) + (yPosition) * (grid[0]?.answerH * heightDifference * grid[0]?.answerColumns) / grid[0]?.answerList.length),
+          (grid[0]?.answerH * grid[0]?.answerColumns * heightDifference / grid[0]?.answerList.length - 10),
+          (grid[0]?.answerH * grid[0]?.answerColumns * heightDifference / grid[0]?.answerList.length - 10)
+        )
+        pdf.setFont(grid[0]?.answerFont)
+        const fontSize = grid[0]?.answerH * grid[0]?.answerColumns * heightDifference / answerList.length - 10
+
+        pdf.setTextColor(grid[0]?.answerColor)
+        pdf.setFontSize(fontSize / 0.65)
+        pdf.text(answer,
+          (grid[0]?.answerX * widthDifference + (grid[0]?.answerH * heightDifference * grid[0]?.answerColumns) / answerList.length + xPosition),
+          ((grid[0]?.answerY * heightDifference) + (yPosition) * (grid[0]?.answerH * heightDifference * grid[0]?.answerColumns) / answerList.length + (fontSize * 0.8)),
+        );
+      })
+    }
+  })
+
+  crosswordPuzzles && crosswordPuzzles?.map((grid) => {
+    if (grid.grid.length < 1) {
+      return;
+    }
+    const maxXYSize = findMaxCoordinates(grid.grid)
+    const maxSize = maxXYSize.x > maxXYSize.y ? maxXYSize.x + 1 : maxXYSize.y + 1
+    pdf.setPage(parseInt(grid?.pageNumber))
+    pdf.setLineWidth(grid?.mazeBorderSize);
+    // @ts-ignore
+    const currentSquareWidth = grid?.w / maxSize * widthDifference
+    // @ts-ignore
+    const currentSquareHeight = grid?.h / maxSize * heightDifference
+
+    grid.grid.map(({ x, y, letter, horizontalNumber, verticalNumber  }) => {
+      const startCoordinatesX = x * currentSquareWidth
+      const startCoordinatesY = y * currentSquareWidth
+
+      pdf.setDrawColor(grid?.mazeBorderColor)
+      pdf.setFont(grid?.mazeFont)
+      pdf.rect(
+        (grid?.x * widthDifference + startCoordinatesX),
+        (grid?.y * heightDifference + startCoordinatesY),
+        currentSquareWidth,
+        currentSquareHeight,
+      )
+
+      pdf.setFontSize(currentSquareWidth * 0.4 / 0.75)
+
+      horizontalNumber && pdf.text(
+        horizontalNumber.toString(),
+        (grid?.x * widthDifference) + startCoordinatesX + 2,
+        (grid?.y * heightDifference) + startCoordinatesY + currentSquareWidth * 0.40
+      )
+      verticalNumber && pdf.text(
+        verticalNumber.toString(),
+        (grid?.x * widthDifference) + startCoordinatesX + 2,
+        (grid?.y * heightDifference) + startCoordinatesY + currentSquareWidth * 0.40
+      )
+
+      pdf.setFontSize(currentSquareWidth * 0.6 / 0.75)
+      pdf.setTextColor(grid?.mazeColor)
+      // pdf.text(letter,
+      //   // @ts-ignore
+      //   ((grid?.x * widthDifference) + startCoordinatesX + currentSquareWidth / 2 - context.measureText(letter).width / 4),
+      //   ((grid?.y * heightDifference) + startCoordinatesY + currentSquareHeight / 2 + (currentSquareHeight / 5)),
+      // )
+    })
+  })
+
+  texts.map((text) => {
+    pdf.setPage(parseInt(text.pageNumber))
+    const size = text.size; // convert pixels to points
+    pdf.setFontSize(size);
+
+    pdf.setFont("Pacifico");
+    pdf.setFont("Meow Script");
+    pdf.setFont("Emilys Candy");
+    pdf.setFont("DynaPuff")
+    pdf.setFont("Delius Unicase")
+    pdf.setFont("Delius")
+    pdf.setFont("Comic Relief")
+    pdf.setFont("Roboto")
+    pdf.setFont("Open Sans")
+
+    const xAlignment = () => {
+      if (text.align === 'center') {
+        return (text.initialPosition.x + text.width) * widthDifference / 2
+      }
+      if (text.align === 'right') {
+        return (text.initialPosition.x + text.width) * widthDifference
+      }
+      return (text.initialPosition.x * widthDifference)
+    }
+    pdf.setTextColor(text.color)
+    pdf.setFont(text.font)
+    pdf.text(
+      text.value,
+      // text.initialPosition.x * widthDifference,
+      xAlignment(),
+      text.initialPosition.y * heightDifference,
+      {
+        baseline: 'top',
+        maxWidth: text.width * widthDifference,
+        // angle: -text.getAbsoluteRotation(),
+        align: text.align
+      });
+  });
+
+  pdf.save(`${fileName}.pdf`);
 };

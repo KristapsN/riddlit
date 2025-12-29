@@ -24,6 +24,7 @@ export const firstTemplate = (pdfPreviewHeight: number, pdfSize: number[]) => {
       mazeColor: '#000000',
     }
   ]
+
   ,
   text: [
     {

@@ -1,12 +1,13 @@
 'use client'
 
 import { Stage, Layer, Rect, Transformer } from "react-konva"
-import { GridWithPropsProps, ImageDraggedProps, PageElementProps, TextsProps } from "../app/protected/page"
+import { CrosswordTextProps, GridWithPropsProps, ImageDraggedProps, PageElementProps, TextsProps } from "../app/protected/page"
 import React, { useEffect, useRef, useState, forwardRef } from "react"
 import { WordMaze } from "./WorMaze"
 import { ImageElement } from "./Image"
 import { Button } from "@mui/material"
 import TextComponent from "./TextComponent"
+import { Crossword } from "./Crossword"
 
 interface PaperProps {
   width: number
@@ -19,11 +20,15 @@ interface PaperProps {
   showAnswerList: boolean
   images: ImageDraggedProps[]
   setImages: any
-  pdfSize: number[]
   currentPage: string
   selectImage: any
   isImageSelected: boolean
   pages: PageElementProps[]
+  setSelectedAccordion: React.Dispatch<React.SetStateAction<string>>
+  setOpenedToolPage: React.Dispatch<React.SetStateAction<string>>
+  setCrosswordText: React.Dispatch<React.SetStateAction<CrosswordTextProps[]>>
+  crosswordText: CrosswordTextProps[]
+  openCrosswordAnswerMarkers: boolean
 }
 
 const Paper = forwardRef((
@@ -38,11 +43,15 @@ const Paper = forwardRef((
     showAnswerList,
     images,
     setImages,
-    pdfSize,
     currentPage,
     selectImage,
     isImageSelected,
     pages,
+    setSelectedAccordion,
+    setOpenedToolPage,
+    setCrosswordText,
+    crosswordText,
+    openCrosswordAnswerMarkers,
   }: PaperProps, ref) => {
   const [selectedId, selectShape] = useState<string | null>(null);
   const selectionRectRef = React.useRef('');
@@ -52,8 +61,7 @@ const Paper = forwardRef((
 
   const history = useRef([]);
   const historyStep = useRef(0);
-
-
+console.log('selectedId', selectedId)
   useEffect(() => {
     !isImageSelected && selectShape(null)
   }, [isImageSelected])
@@ -77,9 +85,7 @@ const Paper = forwardRef((
   };
 
   const onDeleteImage = (id: string) => {
-    // const newImages = [...images];
-    // newImages.splice(node.index, 1);
-    const newImages = images.filter((item) => item.id !== id);
+    const newImages = images.filter((item) => `image${item.id}` !== selectedId);
 
     setImages(newImages);
     selectShape(null);
@@ -164,7 +170,9 @@ const Paper = forwardRef((
                   // stageScale={stageSpec.scale}
                   isSelected={`image${image.id}` === selectedId}
                   unSelectShape={unSelectShape}
-                  onClick={() => handleRemove(image.id)}
+                  onClick={() =>
+                    handleRemove(image.id)
+                  }
                   onSelect={() => {
                     selectImage(image.id)
                     selectShape(`image${image.id}`);
@@ -197,7 +205,7 @@ const Paper = forwardRef((
                 />
               )
             })}
-          {createGrid.filter((item) => item[0].pageNumber === currentPage).map((grid, index) => {
+          {createGrid.filter((item) => item && item[0]?.pageNumber === currentPage).map((grid, index) => {
             const answerList = grid[0].answerList.map(
               (item: { letter: any }[]) => item.map(({ letter }) => letter).join('')
             )
@@ -220,10 +228,12 @@ const Paper = forwardRef((
                   id === 'maze' && selectShape(`maze${grid[0].id}`);
                   (id === 'answers' && isGrouped) && selectShape(`answers${grid[0].id}`);
                   (id.split('_')[0] === 'answer' && !isGrouped) && selectShape(id);
+                  setOpenedToolPage('maze')
+                  setSelectedAccordion(grid[0].id)
                 }}
                 onChange={(newAttrs) => {
                   const newGrid = [...createGrid];
-                  const grd = createGrid.find((item) => item[0].id === grid[0].id)
+                  const grd = createGrid.find((item) => item[0]?.id === grid[0].id)
                   if (grd) {
                     grd[0].x = newAttrs.x
                     grd[0].y = newAttrs.y
@@ -249,7 +259,44 @@ const Paper = forwardRef((
               />
             )
           })}
-          {texts.filter((item) => item.pageNumber === currentPage && item.value).map((item, index) => {
+
+          {crosswordText.filter((item) => item && item?.pageNumber === currentPage).map((crossword, index) => {
+
+            return (
+              <Crossword
+                key={index}
+                // initialSquareSize={initialSquareSize}
+                crosswordPuzzle={crossword}
+                isSelected={`crossword${crossword.id}` === selectedId}
+                // @ts-ignore
+                onSelect={(id) => {
+                  console.log('id', id)
+                  id === 'crossword' && selectShape(`crossword${crossword.id}`);
+                  setOpenedToolPage('crossword')
+                  setSelectedAccordion(crossword.id)
+                }}
+                onChange={(newAttrs) => {
+                  const newGrid = [...crosswordText];
+                  const grd = crosswordText.find((item) => item?.id === crossword.id)
+                  if (grd) {
+                    crossword.x = newAttrs.x
+                    crossword.y = newAttrs.y
+                    crossword.w = newAttrs.w
+                    crossword.h = newAttrs.h
+                  }
+                  setCreateGridWithProps(newGrid)
+
+                }}
+                // @ts-ignore
+                mazeBorderSize={crossword.mazeBorderSize}
+                mazeBorderColor={crossword.mazeBorderColor}
+                mazeColor={crossword.mazeColor}
+                mazeFont={crossword.mazeFont}
+                openCrosswordAnswerMarkers={openCrosswordAnswerMarkers}
+              />
+            )
+          })}
+          {texts.filter((item) => item?.pageNumber === currentPage && item.value).map((item, index) => {
             return (
               <React.Fragment key={index}>
                 <TextComponent
@@ -268,6 +315,8 @@ const Paper = forwardRef((
                   // onClick={() => handleRemove(image.id)}
                   onSelect={() => {
                     selectShape(`text_${item.id}`);
+                    setSelectedAccordion(item.id)
+                    setOpenedToolPage('texts')
                   }}
                   // @ts-ignore
                   onChange={(newAttrs) => {

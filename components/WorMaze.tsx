@@ -101,6 +101,7 @@ export const WordMaze = ({
           ref={shapeRef}
           // onSelect={() => { }}
           draggable
+          onMouseDown={() =>onSelect('maze')}
           onDragEnd={(e) => {
             // @ts-ignore
             shapeRef.current.attrs.x = e.target.x()
@@ -259,6 +260,7 @@ export const WordMaze = ({
             // @ts-ignore
             ref={answersShapeRef}
             onClick={() => onSelect('answers', true)}
+            onMouseDown={() => onSelect('answers', true)}
             onDragEnd={(e) => {
               onChange({
                 ...createGridWithProps,
